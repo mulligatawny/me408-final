@@ -1,8 +1,22 @@
+###############################################################################
+# 2D Incompressible Navier-Stokes Solver with Periodic Boundaries, Galerkins' #
+# Method and Adams-Bashforth Time Integration                                 #
+###############################################################################
+
 import numpy as np
 import matplotlib.pyplot as plt
 from subroutines import compute_fk
+from matplotlib import cm
 
-def fu(uk):
+def compute_pressure():
+    return 0
+
+def compute_vorticity():
+    return 0
+
+def fu(uk, vk):
+    fku = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=0)
+    fkv = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=1)
     a = np.zeros_like(uk)
     d = np.zeros_like(uk)
     for i in range(N):
@@ -16,7 +30,9 @@ def fu(uk):
             d[i,j] = nu*(n1[i]**2 + n2[j]**2)*uk[i,j]
     return fku -a -d
 
-def fv(vk):
+def fv(uk, vk):
+    fku = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=0)
+    fkv = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=1)
     a = np.zeros_like(vk)
     d = np.zeros_like(vk)
     for i in range(N):
@@ -35,8 +51,8 @@ L = 2*np.pi
 nu = 1
 
 # mesh
-x = np.linspace(-np.pi, np.pi, N+1)[:-1]
-y = np.linspace(-np.pi, np.pi, N+1)[:-1]
+x = np.linspace(-L/2, L/2, N+1)[:-1]
+y = np.linspace(-L/2, L/2, N+1)[:-1]
 X, Y = np.meshgrid(x, y)
 
 # wavenumbers
@@ -47,8 +63,8 @@ n2 = np.arange(-N/2, N/2)*(2*np.pi/L)
 u0 = 0.5*(np.sin(Y+X) +np.sin(Y-X))
 v0 = -0.5*(np.sin(X+Y) +np.sin(X-Y))
 t = 0.0
-tf = 0.03
-dt = 2e-5
+tf = 2.0
+dt = 5e-4
 
 # transform I.C.
 uk = np.fft.fftshift(np.fft.fftn(u0))/N**2
@@ -61,37 +77,34 @@ uknm1 = np.zeros_like(uk)
 vknm1 = np.zeros_like(vk)
 
 # first timestep with forward Euler
-# time integrate
 fku = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=0)
 fkv = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=1)
+uknp1 = uk + dt*fu(uk, vk)
+vknp1 = vk + dt*fv(uk, vk)
+uknm1 = uk
+vknm1 = vk
+uk = uknp1
+vk = vknp1
 
-#uknp1 = uk + dt*fu(uk)
-#vknp1 = vk + dt*fv(vk)
-#wknp1 = wk + dt*fw(wk)
-#
-#uknm1 = uk
-#vknm1 = vk
-#wknm1 = wk
-#
-#uk = uknp1
-#vk = vknp1
-#wk = wknp1
-
+# time integrate using Adams-Bashforth
 while t < tf:
-
-    uknp1 = uk + dt*fu(uk)
-    vknp1 = vk + dt*fv(vk)
-
+    uknp1 = uk + (dt/2)*(3*fu(uk, vk) - fu(uknm1, vknm1))
+    vknp1 = vk + (dt/2)*(3*fv(uk, vk) - fv(uknm1, vknm1))
+    uknm1 = uk
+    vknm1 = vk
     uk = uknp1
     vk = vknp1
-
-    fku = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=0)
-    fkv = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=1)
-
     t = t + dt
 
-solu = np.fft.ifftn(np.fft.ifftshift(uknp1))*(N**2)
-solv = np.fft.ifftn(np.fft.ifftshift(vknp1))*(N**2)
-plt.contourf(X, Y, np.real(solu))
-plt.colorbar()
-plt.show()
+solu = np.real(np.fft.ifftn(np.fft.ifftshift(uk))*(N**2))
+solv = np.real(np.fft.ifftn(np.fft.ifftshift(vk))*(N**2))
+np.save('./data/32x32/t2/x.npy', X)
+np.save('./data/32x32/t2/y.npy', Y)
+np.save('./data/32x32/t2/u.npy', solu)
+np.save('./data/32x32/t2/v.npy', solv)
+np.save('./data/32x32/t2/t.npy', t)
+
+#plt.contourf(X, Y, solu, cmap=cm.inferno)
+#plt.colorbar()
+#plt.quiver(X, Y, solu, solv, cmap=cm.gray)
+#plt.show()
