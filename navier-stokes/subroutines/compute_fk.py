@@ -12,15 +12,15 @@ def compute_fk(N, n1, n2, uk, vk, dim=0):
         Returns:
         fk (2d_array) : Fourier transform of the advection term in x, y
     """
-    u = np.fft.ifftn(np.fft.ifftshift(uk))*N**2
-    v = np.fft.ifftn(np.fft.ifftshift(vk))*N**2
+    u = np.fft.ifft2(np.fft.ifftshift(uk))*N**2
+    v = np.fft.ifft2(np.fft.ifftshift(vk))*N**2
     if dim == 0:
-        dudx = np.fft.ifftn(np.fft.ifftshift(1j*n1*uk))*N**2
-        dudy = np.fft.ifftn(np.fft.ifftshift(1j*n2*uk))*N**2 
+        dudx = np.fft.ifft2(np.fft.ifftshift(1j*n1*uk))*N**2
+        dudy = np.fft.ifft2(np.fft.ifftshift(1j*n2*uk))*N**2 
         f = -u*dudx -v*dudy
     elif dim == 1:
-        dvdx = np.fft.ifftn(np.fft.ifftshift(1j*n1*vk))*N**2
-        dvdy = np.fft.ifftn(np.fft.ifftshift(1j*n2*vk))*N**2 
+        dvdx = np.fft.ifft2(np.fft.ifftshift(1j*n1*vk))*N**2
+        dvdy = np.fft.ifft2(np.fft.ifftshift(1j*n2*vk))*N**2 
         f = -u*dvdx -v*dvdy
 
-    return np.fft.fftshift(np.fft.fftn(f))/N**2
+    return np.fft.fftshift(np.fft.fft2(f))/N**2

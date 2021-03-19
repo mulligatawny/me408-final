@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from subroutines import compute_fk
 from matplotlib import cm
 
 u = np.load('./u.npy')
@@ -12,7 +11,7 @@ w = np.load('./w.npy')
 p = np.load('./p.npy')
 e = np.load('./e.npy')
 
-plt.contourf(x, y, u, cmap=cm.inferno, vmin=-1, vmax=1)
+plt.contourf(x, y, u, cmap=cm.inferno, vmin=-.1, vmax=.1)
 #plt.contourf(x, y, w, cmap=cm.binary)
 plt.colorbar()
 plt.xlabel('$x$')
