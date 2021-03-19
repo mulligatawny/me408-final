@@ -2,6 +2,8 @@
 
 The source files for the final exam. 
 
+![alt text](https://github.com/mulligatawny/me408-final/blob/main/navier-stokes/figures/32x32/t0pt5/Figure_1.png)
+
 ## Spectral Navier-Stokes solver
 
 ### File manifest
