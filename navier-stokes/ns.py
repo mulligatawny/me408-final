@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 from subroutines import compute_fk
 from subroutines import compute_vorticity
 from subroutines import compute_pressure
-from matplotlib import cm
 
 save_data = 0
 
@@ -101,6 +100,7 @@ while t < tf:
     count = count + 1
     t = t + dt
 
+# return to physical space
 u = np.real(np.fft.ifft2(np.fft.ifftshift(uk))*(N**2))
 v = np.real(np.fft.ifft2(np.fft.ifftshift(vk))*(N**2))
 w = compute_vorticity.compute_vorticity(N, n1, n2, uk, vk)
