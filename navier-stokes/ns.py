@@ -44,7 +44,7 @@ def fv(uk, vk):
                 d[i,j] = nu*(n1[i]**2 + n2[j]**2)*vk[i,j]
     return fkv -a -d
 
-N = 16
+N = 32
 L = 2*np.pi
 nu = 1
 
@@ -61,7 +61,7 @@ n2 = np.arange(-N/2, N/2)*(2*np.pi/L)
 u0 = 0.5*(np.sin(Y+X) +np.sin(Y-X))
 v0 = -0.5*(np.sin(X+Y) +np.sin(X-Y))
 t = 0.0
-tf = 0.1
+tf = 2
 dt = 5e-4
 nt = int(tf/dt+1)
 e = np.zeros(nt)
@@ -96,7 +96,7 @@ while t < tf:
     vk = vknp1
     u = np.real(np.fft.ifft2(np.fft.ifftshift(uk))*(N**2))
     v = np.real(np.fft.ifft2(np.fft.ifftshift(vk))*(N**2))
-    e[count] = (np.mean(u**2) + np.mean(v**2))/2
+    e[count] = (np.sum(u**2) + np.sum(v**2))/2
     count = count + 1
     t = t + dt
 
@@ -106,7 +106,7 @@ v = np.real(np.fft.ifft2(np.fft.ifftshift(vk))*(N**2))
 w = compute_vorticity.compute_vorticity(N, n1, n2, uk, vk)
 p = compute_pressure.compute_pressure(N, n1, n2, uk, vk)
 
-if save_data == 1:
+if save_data:
     np.save('t.npy', t)
     np.save('x.npy', X)
     np.save('y.npy', Y)
