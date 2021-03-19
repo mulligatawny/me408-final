@@ -9,7 +9,8 @@ from subroutines import compute_fk
 from subroutines import compute_vorticity
 from subroutines import compute_pressure
 from matplotlib import cm
-import pdb
+
+save_data = 0
 
 def fu(uk, vk):
     fku = compute_fk.compute_fk(N, n1, n2, uk, vk, dim=0)
@@ -105,16 +106,12 @@ v = np.real(np.fft.ifft2(np.fft.ifftshift(vk))*(N**2))
 w = compute_vorticity.compute_vorticity(N, n1, n2, uk, vk)
 p = compute_pressure.compute_pressure(N, n1, n2, uk, vk)
 
-#np.save('./data/32x32/t2/t.npy', t)
-#np.save('./data/32x32/t2/x.npy', X)
-#np.save('./data/32x32/t2/y.npy', Y)
-#np.save('./data/32x32/t2/u.npy', u)
-#np.save('./data/32x32/t2/v.npy', v)
-#np.save('./data/32x32/t2/w.npy', w)
-#np.save('./data/32x32/t2/p.npy', p)
-#np.save('./data/32x32/t2/e.npy', e)
-
-plt.contourf(X, Y, u, cmap=cm.inferno, vmin=-1, vmax=1)
-plt.colorbar()
-plt.quiver(X, Y, u, v, cmap=cm.gray)
-plt.show()
+if save_data == 1:
+    np.save('t.npy', t)
+    np.save('x.npy', X)
+    np.save('y.npy', Y)
+    np.save('u.npy', u)
+    np.save('v.npy', v)
+    np.save('w.npy', w)
+    np.save('p.npy', p)
+    np.save('e.npy', e)
